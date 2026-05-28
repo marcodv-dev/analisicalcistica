@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useLocation, useNavigate, Outlet } from 'react-router-dom'
 import { useTheme } from '../../hooks/useTheme'
 import { ToastProvider } from '../ui/Toast'
 import graph from '../../assets/graph.png'
@@ -17,20 +18,24 @@ const navItems = [
 
 export default function Layout() {
   useTheme()
+  const navigate = useNavigate()
+  const location = useLocation()
+  useEffect(() => {
+    document.getElementById('root')?.scrollTo(0, 0)
+  }, [location.pathname])
   return (
     <ToastProvider>
       <Outlet />
       <nav className="bottom-nav">
         {navItems.map(item => (
-          <NavLink
+          <div
             key={item.to}
-            to={item.to}
-            end={item.to === '/'}
-            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+            className={`nav-item${location.pathname === item.to ? ' active' : ''}`}
+            onPointerDown={(e) => { e.preventDefault(); navigate(item.to) }}
           >
             <img className='icon-img' src={item.icon} alt="" />
             <span style={{fontSize:12, fontWeight:500}}>{item.label}</span>
-          </NavLink>
+          </div>
         ))}
       </nav>
     </ToastProvider>
