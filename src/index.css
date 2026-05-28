@@ -531,6 +531,18 @@ input[type="range"]::-webkit-slider-thumb {
   bottom: 150px;
 }
 
+.div-logo{
+  position: relative;
+  height: 30px;
+  aspect-ratio: 0.8;
+  >img{
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
+
 @media screen and (min-width: 700px) {
   #root{
     padding-top: calc(var(--nav-height));

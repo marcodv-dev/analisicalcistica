@@ -2,6 +2,8 @@ import { useMatches } from '../hooks/useMatches'
 import { useStats } from '../hooks/useStats'
 import { useTags } from '../hooks/useTags'
 import DashboardView from '../components/dashboard/DashboardView'
+import logo1 from '../assets/logo6.png'
+import logo2 from '../assets/logo5.png'
 
 export default function DashboardPage() {
   const { matches, loading } = useMatches()
@@ -15,7 +17,13 @@ export default function DashboardPage() {
   return (
     <>
       <div className="page-header">
-        <h1 className="page-title">Home</h1>
+        <h1 className="page-title" style={{display:'flex',gap:5,alignItems:'center'}}>
+          <div className='div-logo'>
+            <img src={logo1} className='icon-logo' style={{top:'-2px'}} alt="" />
+            <img src={logo2} alt="" />
+          </div>
+          Home
+          </h1>
         <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
           {stats.totalMatches} partite
         </span>

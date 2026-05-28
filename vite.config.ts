@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg'],
+      includeAssets: ['icon_logo.png'],
       manifest: {
         name: 'Tabellino Personale - Winger Stats',
         short_name: 'Tabellino',
@@ -19,8 +19,8 @@ export default defineConfig({
         orientation: 'portrait',
         start_url: '/',
         icons: [
-          { src: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          { src: '/icon_logo.png', sizes: '192x192', type: 'image/png' },
+          { src: '/icon_logo.png', sizes: '512x512', type: 'image/png' },
         ],
       },
       workbox: {
