@@ -16,12 +16,7 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "ignoreDeprecations": "6.0",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+    "resolveJsonModule": true
   },
   "include": ["src", "vite-env.d.ts"]
 }
