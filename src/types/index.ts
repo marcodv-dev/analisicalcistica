@@ -143,6 +143,7 @@ export interface Match {
   opponent: string
   competition: CompetitionType
   competitionName: string
+  seasonId?: string
   matchTitle?: string
   homeAway: 'home' | 'away' | 'neutral'
   formation: string

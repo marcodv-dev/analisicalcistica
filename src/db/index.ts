@@ -2,43 +2,52 @@ import { openDB, IDBPDatabase } from 'idb'
 import type { Match, Tag, Season, SeasonGoal, Injury, AppSettings } from '../types'
 
 const DB_NAME = 'tabellino-personale'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 let dbPromise: Promise<IDBPDatabase> | null = null
 
 function getDb() {
   if (!dbPromise) {
     dbPromise = openDB(DB_NAME, DB_VERSION, {
-      upgrade(db) {
-        if (!db.objectStoreNames.contains('matches')) {
-          const matchesStore = db.createObjectStore('matches', { keyPath: 'id' })
-          matchesStore.createIndex('date', 'date')
-          matchesStore.createIndex('opponent', 'opponent')
-          matchesStore.createIndex('competition', 'competition')
-          matchesStore.createIndex('homeAway', 'homeAway')
-          matchesStore.createIndex('primaryRole', 'primaryRole')
-          matchesStore.createIndex('lineupStatus', 'lineupStatus')
+      upgrade(db, oldVersion, newVersion, transaction) {
+        if (oldVersion < 1) {
+          if (!db.objectStoreNames.contains('matches')) {
+            const matchesStore = db.createObjectStore('matches', { keyPath: 'id' })
+            matchesStore.createIndex('date', 'date')
+            matchesStore.createIndex('opponent', 'opponent')
+            matchesStore.createIndex('competition', 'competition')
+            matchesStore.createIndex('homeAway', 'homeAway')
+            matchesStore.createIndex('primaryRole', 'primaryRole')
+            matchesStore.createIndex('lineupStatus', 'lineupStatus')
+            matchesStore.createIndex('seasonId', 'seasonId')
+          }
+          if (!db.objectStoreNames.contains('tags')) {
+            const tagsStore = db.createObjectStore('tags', { keyPath: 'id' })
+            tagsStore.createIndex('category', 'category')
+            tagsStore.createIndex('useCount', 'useCount')
+          }
+          if (!db.objectStoreNames.contains('seasons')) {
+            const seasonsStore = db.createObjectStore('seasons', { keyPath: 'id' })
+            seasonsStore.createIndex('isActive', 'isActive')
+          }
+          if (!db.objectStoreNames.contains('seasonGoals')) {
+            const goalsStore = db.createObjectStore('seasonGoals', { keyPath: 'id' })
+            goalsStore.createIndex('seasonId', 'seasonId')
+          }
+          if (!db.objectStoreNames.contains('injuries')) {
+            const injuriesStore = db.createObjectStore('injuries', { keyPath: 'id' })
+            injuriesStore.createIndex('startDate', 'startDate')
+            injuriesStore.createIndex('bodyPart', 'bodyPart')
+          }
+          if (!db.objectStoreNames.contains('appSettings')) {
+            db.createObjectStore('appSettings', { keyPath: 'key' })
+          }
         }
-        if (!db.objectStoreNames.contains('tags')) {
-          const tagsStore = db.createObjectStore('tags', { keyPath: 'id' })
-          tagsStore.createIndex('category', 'category')
-          tagsStore.createIndex('useCount', 'useCount')
-        }
-        if (!db.objectStoreNames.contains('seasons')) {
-          const seasonsStore = db.createObjectStore('seasons', { keyPath: 'id' })
-          seasonsStore.createIndex('isActive', 'isActive')
-        }
-        if (!db.objectStoreNames.contains('seasonGoals')) {
-          const goalsStore = db.createObjectStore('seasonGoals', { keyPath: 'id' })
-          goalsStore.createIndex('seasonId', 'seasonId')
-        }
-        if (!db.objectStoreNames.contains('injuries')) {
-          const injuriesStore = db.createObjectStore('injuries', { keyPath: 'id' })
-          injuriesStore.createIndex('startDate', 'startDate')
-          injuriesStore.createIndex('bodyPart', 'bodyPart')
-        }
-        if (!db.objectStoreNames.contains('appSettings')) {
-          db.createObjectStore('appSettings', { keyPath: 'key' })
+        if (oldVersion < 2) {
+          const store = transaction.objectStore('matches')
+          if (!store.indexNames.contains('seasonId')) {
+            store.createIndex('seasonId', 'seasonId')
+          }
         }
       },
     })

@@ -88,13 +88,13 @@ export default function DashboardView({ matches, stats, tags }: Props) {
             <div className="stat-label">Personale</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value" style={{ color: stats.avgSelfRating >= 6 ? 'var(--success)' : stats.avgSelfRating >= 5 ? 'var(--warning)' : 'var(--danger)' }}>
+            <div className="stat-value" style={{ color: stats.avgMisterRating >= 6 ? 'var(--success)' : stats.avgMisterRating >= 5 ? 'var(--warning)' : 'var(--danger)' }}>
               {stats.avgMisterRating || '—'}
             </div>
             <div className="stat-label">Mister</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value" style={{ color: stats.avgSelfRating >= 6 ? 'var(--success)' : stats.avgSelfRating >= 5 ? 'var(--warning)' : 'var(--danger)' }}>
+            <div className="stat-value" style={{ color: stats.avgAutoRating >= 6 ? 'var(--success)' : stats.avgAutoRating >= 5 ? 'var(--warning)' : 'var(--danger)' }}>
               {stats.avgAutoRating || '—'}
             </div>
             <div className="stat-label">Auto</div>

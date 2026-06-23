@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { useMatches } from '../hooks/useMatches'
+import { useSeasons } from '../hooks/useSeasons'
 import { useToast } from '../components/ui/Toast'
 import MatchList from '../components/history/MatchList'
 import MatchDetail from '../components/history/MatchDetail'
@@ -15,11 +16,13 @@ type FilterType = 'all' | 'goals' | 'assists' | 'starter' | 'substitute' | 'high
 
 export default function HistoryPage() {
   const { matches, loading, removeMatch } = useMatches()
+  const { seasons } = useSeasons()
   const { toast } = useToast()
   const [filter, setFilter] = useState<FilterType>('all')
   const [search, setSearch] = useState('')
   const [selectedMonth, setSelectedMonth] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
+  const [selectedSeason, setSelectedSeason] = useState('')
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
 
   const now = new Date()
@@ -55,12 +58,19 @@ export default function HistoryPage() {
         return monthMatch && yearMatch
       })
     }
+    if (selectedSeason) {
+      if (selectedSeason === 'friendly') {
+        result = result.filter(m => m.competition === 'friendly' || !m.seasonId)
+      } else {
+        result = result.filter(m => m.seasonId === selectedSeason)
+      }
+    }
     if (search.trim()) {
       const q = search.toLowerCase()
       result = result.filter(m => m.opponent.toLowerCase().includes(q) || m.notes?.toLowerCase().includes(q))
     }
     return result
-  }, [matches, filter, search, selectedMonth, selectedYear, currentYear])
+  }, [matches, filter, search, selectedMonth, selectedYear, selectedSeason, currentYear])
 
   if (loading) {
     return <div className="loading"><div className="spinner" /></div>
@@ -111,6 +121,17 @@ export default function HistoryPage() {
             ))}
           </select>
         </div>
+        <select
+          value={selectedSeason}
+          onChange={e => setSelectedSeason(e.target.value)}
+          style={{ flex: 1, padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--card-bg)', color: 'var(--text)', fontSize: '0.85rem' }}
+        >
+          <option value="">Stagione</option>
+          <option value="friendly">Amichevoli</option>
+          {seasons.map(s => (
+            <option key={s.id} value={s.id}>{s.name}</option>
+          ))}
+        </select>
       </div>
 
       <div className="filter-bar">

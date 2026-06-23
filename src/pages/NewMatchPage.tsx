@@ -3,9 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMatches } from '../hooks/useMatches'
 import * as db from '../db'
 import { useTags } from '../hooks/useTags'
+import { useSeasons } from '../hooks/useSeasons'
 import { useToast } from '../components/ui/Toast'
 import type { Match, Role, Weather, PitchType, PitchCondition, MentalState, CompetitionType, Tag } from '../types'
-import { ROLES, WEATHER_OPTIONS, PITCH_TYPE_OPTIONS, PITCH_CONDITION_OPTIONS, MENTAL_STATE_OPTIONS, COMPETITION_OPTIONS } from '../types'
+import { ROLES, WEATHER_OPTIONS, PITCH_TYPE_OPTIONS, PITCH_CONDITION_OPTIONS, MENTAL_STATE_OPTIONS } from '../types'
 import back from '../assets/left-chevron.png'
 import save from '../assets/diskette.png'
 import home from '../assets/house.png'
@@ -14,7 +15,7 @@ interface FormData {
   date: string
   opponent: string
   competition: CompetitionType
-  competitionName: string
+  seasonId: string
   matchTitle: string
   homeAway: 'home' | 'away' | 'neutral'
   formation: string
@@ -61,7 +62,7 @@ const initialForm: FormData = {
   date: new Date().toISOString().split('T')[0],
   opponent: '',
   competition: 'league',
-  competitionName: '',
+  seasonId: '',
   matchTitle: '',
   homeAway: 'home',
   formation: '4-3-3',
@@ -110,6 +111,7 @@ export default function NewMatchPage() {
   const isEditing = !!id
   const { addMatch, editMatch } = useMatches()
   const { tags } = useTags()
+  const { seasons } = useSeasons()
   const { toast } = useToast()
   const [form, setForm] = useState<FormData>(initialForm)
   const [saving, setSaving] = useState(false)
@@ -126,7 +128,7 @@ export default function NewMatchPage() {
         date: match.date.split('T')[0],
         opponent: match.opponent,
         competition: match.competition,
-        competitionName: match.competitionName || '',
+        seasonId: match.seasonId || '',
         matchTitle: match.matchTitle || '',
         homeAway: match.homeAway,
         formation: match.formation,
@@ -176,7 +178,7 @@ export default function NewMatchPage() {
   }, [id, navigate])
 
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
-  const TEXT_FIELDS = new Set<keyof FormData>(['opponent', 'competitionName', 'matchTitle', 'notes', 'opponentNotes'])
+  const TEXT_FIELDS = new Set<keyof FormData>(['opponent', 'matchTitle', 'notes', 'opponentNotes'])
   const set = (field: keyof FormData, value: any) =>
     setForm(prev => ({ ...prev, [field]: TEXT_FIELDS.has(field) ? capitalize(String(value)) : value }))
 
@@ -197,11 +199,13 @@ export default function NewMatchPage() {
     setSaving(true)
 
     try {
+      const selectedSeason = form.seasonId ? seasons.find(s => s.id === form.seasonId) : undefined
       const matchData: Omit<Match, 'id' | 'createdAt' | 'updatedAt' | 'autoRating'> = {
         date: form.date,
         opponent: form.opponent,
         competition: form.competition,
-        competitionName: form.competitionName,
+        competitionName: selectedSeason ? selectedSeason.name : '',
+        seasonId: form.seasonId || undefined,
         matchTitle: form.matchTitle || undefined,
         homeAway: form.homeAway,
         formation: form.formation,
@@ -318,12 +322,30 @@ export default function NewMatchPage() {
           <div className="form-row">
             <div className="form-group">
               <label>Competizione</label>
-              {select('competition', COMPETITION_OPTIONS)}
+              <select value={form.competition} onChange={e => {
+                set('competition', e.target.value)
+                if (e.target.value !== 'league') set('seasonId', '')
+              }}>
+                <option value="league">Stagione</option>
+                <option value="friendly">Amichevole</option>
+              </select>
             </div>
-            <div className="form-group">
-              <label>Nome competizione</label>
-              {input('competitionName', { placeholder: 'es. Serie D - Girone C' })}
-            </div>
+            {form.competition === 'league' && (
+              <div className="form-group">
+                <label>Stagione</label>
+                <select value={form.seasonId} onChange={e => set('seasonId', e.target.value)}>
+                  <option value="">— Seleziona —</option>
+                  {seasons.filter(s => {
+                    const now = new Date()
+                    const start = new Date(s.startDate + 'T00:00:00')
+                    const end = new Date(s.endDate + 'T23:59:59')
+                    return now >= start && now <= end
+                  }).map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
           <div className="form-row">
             <div className="form-group">

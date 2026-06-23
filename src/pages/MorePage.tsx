@@ -13,9 +13,9 @@ type Tab = 'tags' | 'seasons' | 'injuries' | 'settings'
 
 const tabs: { key: Tab; label: string; icon: string }[] = [
   { key: 'settings', label: 'Impostazioni', icon: settings },
-  { key: 'tags', label: 'Tag', icon: tags },
   { key: 'seasons', label: 'Stagioni', icon: trophy },
   { key: 'injuries', label: 'Infortuni', icon: injury },
+  { key: 'tags', label: 'Tag', icon: tags },
 ]
 
 export default function MorePage() {
